@@ -1,14 +1,13 @@
 import os
-from flask import Flask
+from fastapi import FastAPI
 
-app = Flask(__name__)
+app = FastAPI()
 
-@app.route("/")
-def home():
-    return "Hello from Railway 🚀"
+@app.get("/")
+def read_root():
+    return {"message": "Hello from Railway 🚀"}
 
-# نقطة تشغيل التطبيق
 if __name__ == "__main__":
-    # Railway يعطي PORT في متغير البيئة
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
