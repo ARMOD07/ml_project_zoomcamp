@@ -1,0 +1,32 @@
+# Build the Docker image and give it the name "mlp-service:v1"
+docker build -t mlp-service:v1 .
+
+# Run the Docker container and open port 8080 to use the app
+docker run -p 8080:8080 mlp-service:v1
+
+# Run the Docker container again (same as above)
+docker run -p 8080:8080 mlp-service:v1
+
+http://localhost:8080 - للتحقق من التشغيل
+
+http://localhost:8080/health - للتحقق من تحميل النموذج
+
+http://localhost:8080/docs - للاختبار عبر Swagger UI
+### Kubernetes
+# Create a local Kubernetes cluster called "mlzoomcamp"
+kind create cluster --name mlzoomcamp
+
+# Load the Docker image "mlp-service:v1" into the Kubernetes cluster
+kind load docker-image mlp-service:v1 --name mlzoomcamp
+
+# Deploy the app to Kubernetes using the deployment configuration file
+kubectl apply -f k8s/deployment.yaml
+
+# Expose the app with a service using the service configuration file
+kubectl apply -f k8s/service.yaml
+
+# Forward the app port to your computer so you can use it in the browser
+kubectl port-forward service/mlp-service 8080:8080
+
+# Open this link in your browser to test the app
+http://localhost:8080/predict
