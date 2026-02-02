@@ -8,13 +8,14 @@ import numpy as np
 from pydantic import BaseModel
 from typing import List
 
+# Initialize FastAPI app
 app = FastAPI(title="ML Prediction Service")
 
-# متغيرات النموذج
+# Global variables for model and scaler
 model = None
 scaler = None
 
-# قائمة الميزات
+# List of features used by the model
 selected_features = [
     "nb_funding_rounds",
     "nb_investors", 
@@ -26,7 +27,7 @@ selected_features = [
     "funding_rounds"
 ]
 
-# نموذج بيانات الإدخال
+# Pydantic model for input validation
 class PredictionInput(BaseModel):
     nb_funding_rounds: float = 0
     nb_investors: float = 0
@@ -37,29 +38,29 @@ class PredictionInput(BaseModel):
     relationships: float = 0
     funding_rounds: float = 0
 
-# دالة لتحميل النموذج
+# Function to load ML model and scaler
 def load_ml_model():
-    """تحميل نموذج ML والـ scaler"""
+    """Load ML model and scaler from files"""
     global model, scaler
     
     try:
-        print("🔍 جاري البحث عن ملفات النموذج...")
+        print("🔍 Searching for model files...")
         
-        # القائمة بالمسارات المحتملة
+        # List of possible file paths (tries different locations)
         possible_paths = [
-            # 1. داخل مجلد service الحالي
+            # 1. Current directory
             {
                 "arch": "mlp_model_architecture.json",
                 "weights": "mlp_model.weights.h5", 
                 "scaler": "mlp_model_scaler.pkl"
             },
-            # 2. في مجلد Projects بجانب service
+            # 2. In Projects folder next to current directory
             {
                 "arch": "../Projects/mlp_model_architecture.json",
                 "weights": "../Projects/mlp_model.weights.h5",
                 "scaler": "../Projects/mlp_model_scaler.pkl"
             },
-            # 3. داخل مجلد Projects في الحاوية
+            # 3. In Projects folder inside container
             {
                 "arch": "Projects/mlp_model_architecture.json",
                 "weights": "Projects/mlp_model.weights.h5",
@@ -73,58 +74,62 @@ def load_ml_model():
             weights_path = paths["weights"]
             scaler_path = paths["scaler"]
             
+            # Check if all files exist
             if (os.path.exists(arch_path) and 
                 os.path.exists(weights_path) and 
                 os.path.exists(scaler_path)):
                 
-                print(f"✅ تم العثور على الملفات في: {arch_path}")
+                print(f"✅ Found files at: {arch_path}")
                 
-                # تحميل النموذج
+                # Load model architecture
                 with open(arch_path, "r") as f:
                     model_json = f.read()
                 model = model_from_json(model_json)
+                
+                # Load model weights
                 model.load_weights(weights_path)
                 
-                # تحميل scaler
+                # Load scaler
                 with open(scaler_path, "rb") as f:
                     scaler = pickle.load(f)
                 
                 loaded = True
-                print("🎯 تم تحميل النموذج بنجاح!")
+                print("🎯 Model loaded successfully!")
                 break
         
+        # If no model files found, create a dummy model for testing
         if not loaded:
-            print("⚠️ لم يتم العثور على ملفات النموذج، جاري إنشاء نموذج وهمي...")
+            print("⚠️ Model files not found, creating dummy model...")
             create_dummy_model()
             
     except Exception as e:
-        print(f"❌ خطأ في تحميل النموذج: {e}")
+        print(f"❌ Error loading model: {e}")
         create_dummy_model()
 
 def create_dummy_model():
-    """إنشاء نموذج وهمي للاختبار"""
+    """Create dummy model for testing when real model is not available"""
     global model, scaler
-    print("🔄 إنشاء نموذج وهمي للاختبار...")
+    print("🔄 Creating dummy model for testing...")
     
-    # نموذج وهمي
+    # Dummy model
     model = "dummy_model"
     
-    # scaler وهمي
+    # Dummy scaler
     import sklearn.preprocessing
     scaler = sklearn.preprocessing.StandardScaler()
     import numpy as np
     scaler.fit(np.random.rand(10, 8))
     
-    print("✅ تم إنشاء نموذج وهمي للاختبار")
+    print("✅ Dummy model created for testing")
 
-# تحميل النموذج عند بدء التشغيل
+# Load model when application starts
 @app.on_event("startup")
 def startup_event():
-    print("🚀 بدء تشغيل خدمة ML...")
+    print("🚀 Starting ML service...")
     load_ml_model()
-    print(f"📊 الميزات: {selected_features}")
+    print(f"📊 Features: {selected_features}")
 
-# نقطة البداية
+# Home endpoint
 @app.get("/")
 def home():
     return {
@@ -140,7 +145,7 @@ def home():
         }
     }
 
-# فحص الصحة
+# Health check endpoint
 @app.get("/health")
 def health():
     return {
@@ -150,23 +155,23 @@ def health():
         "features_count": len(selected_features)
     }
 
-# نقطة التنبؤ
+# Prediction endpoint
 @app.post("/predict")
 def predict(input_data: List[PredictionInput]):
     """
-    إجراء تنبؤات متعددة
+    Make predictions for multiple inputs
     """
     try:
-        # تحويل البيانات
+        # Convert input data to DataFrame
         data = [item.dict() for item in input_data]
         df = pd.DataFrame(data)
         
-        # التأكد من وجود جميع الميزات
+        # Ensure all features are present
         for feature in selected_features:
             if feature not in df.columns:
                 df[feature] = 0
         
-        # إذا كان النموذج وهمي
+        # If using dummy model, return random predictions
         if model == "dummy_model":
             import numpy as np
             predictions = np.random.rand(len(df), 1).tolist()
@@ -177,7 +182,7 @@ def predict(input_data: List[PredictionInput]):
                 "count": len(predictions)
             }
         
-        # التنبؤ الحقيقي
+        # Real prediction with actual model
         X = df[selected_features]
         X_scaled = scaler.transform(X)
         predictions = model.predict(X_scaled).tolist()
@@ -196,11 +201,11 @@ def predict(input_data: List[PredictionInput]):
             "error_type": type(e).__name__
         }
 
-# نقطة اختبار
+# Test endpoint with sample data
 @app.get("/test")
 def test_endpoint():
     """
-    اختبار النموذج ببيانات وهمية
+    Test the model with dummy data
     """
     test_data = [
         PredictionInput(
@@ -227,10 +232,10 @@ def test_endpoint():
     
     return predict(test_data)
 
-# نقطة لرؤية بيانات الإدخال المطلوبة
+# Show required input schema
 @app.get("/input_schema")
 def input_schema():
-    """عرض هيكل بيانات الإدخال المطلوب"""
+    """Display required input structure"""
     return {
         "required_fields": selected_features,
         "example": {
@@ -245,10 +250,10 @@ def input_schema():
         }
     }
 
-# CHANGES MADE HERE - CORRECT PORT HANDLING
+# Main entry point for running the application
 if __name__ == "__main__":
     import uvicorn
-    # Get port from environment variable or default to 8080
-    port = int(os.environ.get("PORT", 8080))
+    # Get port from environment variable or use default 8080
+    port = int(os.environ.get("PORT", 9000))
     print(f"🚀 Starting server on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)

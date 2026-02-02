@@ -17,7 +17,7 @@ COPY mlp_model_scaler.pkl .
  
 # COPY ../Projects ./Projects
 
-EXPOSE 8080
-
+#EXPOSE 8080
+EXPOSE 9000
 #CMD ["python", "-m", "uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
