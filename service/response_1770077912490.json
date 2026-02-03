@@ -1,0 +1,10 @@
+{
+  "status": "success",
+  "model": "dummy",
+  "predictions": [
+    [
+      0.04085381161349133
+    ]
+  ],
+  "count": 1
+}
