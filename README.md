@@ -30,6 +30,35 @@ The goal is to analyze startups and predict their success.
 ## Project Goal
 
 The main objective of this project is to analyze startups and predict their total funding `(funding_total_usd)` based on company features and historical data.
+## Project Structure
+Startup-Investments-Prediction/
+├── service/                       # Service folder (FastAPI / Streamlit)
+│   ├── app.py                      # FastAPI app
+│   ├── api.py                      # API endpoints
+│   ├── Dockerfile                  # Docker file for service
+│   ├── main.py                     # Main file for service
+│   ├── requirements.txt            # Python dependencies
+│   ├── run.sh                       # Run script
+│   ├── streamlit_app.py             # Streamlit user interface
+│   ├── Procfile                     # For deployment (Heroku / Railway)
+│   └── response_*.json              # Test response files
+├── feature_cols.json               # Feature columns for model
+├── mlp_funding_model.h5            # Full deep learning model
+├── mlp_model_architecture.json     # Model architecture
+├── mlp_model.weights.h5            # Model weights
+├── mlp_model_pickle.pkl            # Pickle file for model
+├── mlp_model_scaler.pkl            # Scaler for preprocessing
+├── notebook.ipynb                  # Notebook for analysis
+├── lab.ipynb                        # Main project notebook
+├── main.py                         # Main script (local test)
+├── predict.py                      # Script for prediction
+├── predict-test.py                  # Test prediction script
+├── train.py                        # Training script
+├── README.md                        # Project documentation
+├── commande.txt                     # Notes or commands used
+├── runtime.txt                       # Python version
+├── image-1.png … image-8.png        # Images / charts
+└── .gitattributes                   # Git config file
 
 ## Target Variable
 
