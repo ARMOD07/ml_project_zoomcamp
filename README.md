@@ -204,6 +204,7 @@ python app.py --port 9000
 ![alt text](image-7.png)  
  
 # Hugging Face 🚀
+<img width="930" height="324" alt="image" src="https://github.com/user-attachments/assets/97c2b243-7e4c-437d-a272-e4071525b4d6" />
 
 
 You can try it live on Hugging Face Spaces:  
