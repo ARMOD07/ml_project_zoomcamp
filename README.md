@@ -31,6 +31,7 @@ The goal is to analyze startups and predict their success.
 
 The main objective of this project is to analyze startups and predict their total funding `(funding_total_usd)` based on company features and historical data.
 ## Project Structure
+```bash
 Startup-Investments-Prediction/
 ├── service/                       # Service folder (FastAPI / Streamlit)
 │   ├── app.py                      # FastAPI app
@@ -59,7 +60,7 @@ Startup-Investments-Prediction/
 ├── runtime.txt                       # Python version
 ├── image-1.png … image-8.png        # Images / charts
 └── .gitattributes                   # Git config file
-
+```
 ## Target Variable
 
 `funding_total_usd`: The total amount of funding a startup has received (in USD).
