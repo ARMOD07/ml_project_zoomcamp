@@ -203,7 +203,11 @@ python app.py --port 9000
   
 ![alt text](image-7.png)  
  
+# Hugging Face 🚀
 
+
+You can try it live on Hugging Face Spaces:  
+[**Open the app here**](https://huggingface.co/spaces/mira73/mlstartup)
 
 ## Environment Variables
 
